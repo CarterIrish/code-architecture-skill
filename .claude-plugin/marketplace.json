@@ -1,0 +1,13 @@
+{
+  "name": "code-architecture-marketplace",
+  "plugins": [
+    {
+      "name": "code-architecture",
+      "source": ".",
+      "description": "Plan, document, and review code architecture for software projects. Collaborative workflow with simplicity checks, scope boundaries, and multi-domain support (web, game, C++/CMake).",
+      "skills": [
+        "./"
+      ]
+    }
+  ]
+}
