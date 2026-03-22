@@ -1,13 +1,19 @@
 {
   "name": "code-architecture-marketplace",
+  "description": "Collaborative code architecture planning skill with simplicity checks, scope boundaries, and multi-domain support.",
+  "owner": {
+    "name": "Carter Irish"
+  },
   "plugins": [
     {
       "name": "code-architecture",
-      "source": ".",
+      "source": "./",
       "description": "Plan, document, and review code architecture for software projects. Collaborative workflow with simplicity checks, scope boundaries, and multi-domain support (web, game, C++/CMake).",
-      "skills": [
-        "./"
-      ]
+      "version": "1.1.0",
+      "author": {
+        "name": "Carter Irish"
+      },
+      "category": "development"
     }
   ]
 }
