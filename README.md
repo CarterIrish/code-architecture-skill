@@ -49,10 +49,36 @@ Plus a Mermaid diagram visualizing the system architecture.
 
 ## Installation
 
-Download `code-architecture.skill` from [Releases](../../releases) and drag it into a Claude conversation, or install via Claude Code:
+### Claude Code (recommended)
+
+Add the marketplace and install with two commands:
 
 ```
-# Place the skill directory in your Claude skills path
+/plugin marketplace add CarterIrish/code-architecture-skill
+/plugin install code-architecture@code-architecture-marketplace
+```
+
+Or via terminal:
+
+```bash
+claude plugin marketplace add CarterIrish/code-architecture-skill
+claude plugin install code-architecture@code-architecture-marketplace
+```
+
+### Claude.ai
+
+Download `code-architecture.skill` from [Releases](../../releases) and drag it into a Claude conversation, or upload it in **Settings > Customize > Skills**.
+
+### Manual install
+
+Copy the skill directory into your personal skills folder:
+
+```bash
+# macOS / Linux
+cp -r code-architecture ~/.claude/skills/code-architecture
+
+# Windows (PowerShell)
+Copy-Item -Recurse code-architecture "$HOME\.claude\skills\code-architecture"
 ```
 
 ## Example prompts
