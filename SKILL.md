@@ -6,7 +6,9 @@ description: >
   CLI tools, or any software. Trigger on: "architect," "plan the structure," "how should I organize,"
   "system design," "project structure," "folder structure," "component design," "data flow,"
   "separation of concerns," "restructure my project," "refactor this layout," or "here's my current
-  code, help me plan the next phase." Also handles evolving existing codebases — analyzes provided
+  code, help me plan the next phase." Also triggers on architecture review requests: "review my
+  architecture," "what do you think of this structure," "analyze this codebase," "any recommendations
+  for my project." Also handles evolving existing codebases — analyzes provided
   code, folder structures, or reference projects and builds on them rather than starting from scratch.
   Has deep reference patterns for Node.js/Express, Unity (C#), and C++/CMake, but works for ANY
   technology stack — the core workflow (interview, architecture doc, diagram, consistency check) is
@@ -27,7 +29,6 @@ Identify the specific technology stack from the user's request. Look for explici
 frameworks, languages, and tools — not broad categories.
 
 **Known stacks** (load the corresponding reference file):
-
 - **Node.js / Express**: Express, Node, npm, middleware, REST API with JavaScript/TypeScript → read `references/nodejs-express.md`
 - **Unity**: Unity, C#, MonoBehaviour, ScriptableObject, prefab, scene, game development with C# → read `references/unity.md`
 - **C++ / CMake**: C++, CMake, header files, FetchContent, vcpkg, systems programming → read `references/cpp-cmake.md`
@@ -41,10 +42,11 @@ If the stack is ambiguous and it matters for the architecture (e.g., the user sa
 Also determine the **project mode** — this affects which workflow to follow. The user may provide existing code, but the intent behind providing it matters:
 
 - **Greenfield** (building from scratch, no existing code provided) → proceed to Step 2 (Requirements Interview)
-- **Greenfield with style reference** (building something new, but the user provided existing code as an example of patterns they like — "use this project as a reference," "I like how this is structured," "here's an example of the style I want") → proceed to Step 2 (Requirements Interview). The reference code is input _context_, not the project being architected. Analyze it during the "Handling User-Provided Context" phase of Step 2 to extract patterns, naming conventions, and structural preferences, then apply them to the new project's architecture.
+- **Greenfield with style reference** (building something new, but the user provided existing code as an example of patterns they like — "use this project as a reference," "I like how this is structured," "here's an example of the style I want") → proceed to Step 2 (Requirements Interview). The reference code is input *context*, not the project being architected. Analyze it during the "Handling User-Provided Context" phase of Step 2 to extract patterns, naming conventions, and structural preferences, then apply them to the new project's architecture.
 - **Restructuring** (the user has existing code that IS the project, and wants it reorganized — "my code is messy," "break this apart," "how should I restructure this") → proceed to Step 2R (Restructuring Interview)
+- **Architecture Review** (the user has an existing project and wants an honest assessment — "review my architecture," "what do you think of this structure," "any recommendations for my project," "analyze this codebase") → proceed to Step 2A (Architecture Review). The user isn't asking you to build or restructure anything — they want a critique. They may or may not act on it.
 
-The distinction between "style reference" and "restructuring" is about ownership and intent. If the user says "here's my Express app, it's a mess, help me fix it" — that's restructuring. If the user says "here's an MVC example I like, I want to build a new project using this style" — that's greenfield with a style reference. If ambiguous, ask: "Is this the project you want me to architect, or an example of a style you'd like me to follow?"
+The distinction between "style reference" and "restructuring" is about ownership and intent. If the user says "here's my Express app, it's a mess, help me fix it" — that's restructuring. If the user says "here's an MVC example I like, I want to build a new project using this style" — that's greenfield with a style reference. If the user says "take a look at my project and tell me what you think" — that's architecture review. If ambiguous, ask: "Is this the project you want me to architect, or an example of a style you'd like me to follow, or would you like me to review what you have?"
 
 ### Step 2: Requirements Interview
 
@@ -55,7 +57,7 @@ The distinction between "style reference" and "restructuring" is about ownership
 The user may provide existing context alongside their request — code snippets, folder structures, file uploads, a previous project's layout, or examples of patterns they like. When this happens:
 
 1. **Analyze first, don't ignore.** Before asking interview questions, explicitly acknowledge what was provided. Call out specific patterns, naming conventions, and structural decisions you observe in their code or examples.
-2. **Weigh it heavily, but don't treat it as law.** User-provided context reveals how they think and what they're comfortable with. That's valuable signal — use it to inform the architecture. But if an industry-standard pattern or simpler approach would serve the project better, say so. Explain _why_ the alternative is stronger and let the user decide. The goal is a great architecture, not a copy of what they already have.
+2. **Weigh it heavily, but don't treat it as law.** User-provided context reveals how they think and what they're comfortable with. That's valuable signal — use it to inform the architecture. But if an industry-standard pattern or simpler approach would serve the project better, say so. Explain *why* the alternative is stronger and let the user decide. The goal is a great architecture, not a copy of what they already have.
 3. **Identify what to keep, what to evolve, and what to rethink.** Be specific: "Your route/controller split is solid and I'd keep it. Your data layer could be simplified from three model files to one at this scale — here's why." This makes the skill a collaborator, not a rubber stamp.
 4. **Adapt the interview.** Skip questions that the provided context already answers. If they pasted an Express app with PostgreSQL, don't ask about tech stack preferences — confirm what you see and ask about what's missing.
 5. **If the user uploads files or references a large codebase**, focus on the structural patterns (folder layout, module boundaries, naming conventions, dependency direction) rather than line-by-line code analysis. The goal is architecture, not code review.
@@ -63,7 +65,6 @@ The user may provide existing context alongside their request — code snippets,
 #### Core Interview Questions
 
 Core questions (always ask what isn't already answered by provided context):
-
 1. **Project summary** — What is this project? What problem does it solve or what experience does it create?
 2. **Scale & scope** — How big is this? Solo project, small team, production-scale? How many users/players?
 3. **Core features** — What are the 3-5 most important features or systems?
@@ -79,7 +80,6 @@ If the user's initial message already answers some of these clearly, acknowledge
 After the core questions, add stack-specific follow-ups based on the detected stack. Only ask what's relevant and unanswered.
 
 **Unity / Game projects:**
-
 - Target platform (PC, mobile, web, console)?
 - Art style or asset approach (pixel art, 3D, procedural, purchased assets)?
 - Target scope — game jam, semester project, portfolio piece, commercial release?
@@ -87,14 +87,12 @@ After the core questions, add stack-specific follow-ups based on the detected st
 - Multiplayer or single-player?
 
 **Node.js / Express projects:**
-
 - Will there be a frontend consuming this API, or is it standalone?
 - Expected traffic — personal use, small group, public-facing?
 - Deployment target — home lab, cloud (Heroku, Railway, AWS), containerized?
 - Any existing data or databases to integrate with?
 
 **C++ / CMake projects:**
-
 - Is this a library, an application, or both?
 - Target platforms and compilers (GCC, Clang, MSVC, cross-platform)?
 - Any required third-party dependencies already known?
@@ -106,19 +104,16 @@ For unrecognized stacks, use the core questions only and let the user's answers 
 Each reference file contains a **Pattern Choices** section with 2-3 options for key architectural decisions (e.g., routing style, error handling, state machine approach). These represent decisions where multiple approaches are equally valid and the "right" answer depends on user preference, not best practice.
 
 **When to present pattern choices:**
-
 - After the initial interview batch, once you know the project's scale and features. Some choices only matter for certain project types (e.g., routing style only matters if there are multiple routes).
 - Present only the choices that are relevant to this specific project. A simple CLI tool doesn't need a state machine choice; a game with 3 enemy types does.
 - Present 1-3 pattern choices per project. More than that overwhelms the interview. Pick the ones that most affect the architecture's shape.
 
 **How to present them:**
-
 - Use the short labels from the reference file (A, B, C) with a one-sentence description of each option. Don't dump code examples during the interview — those are reference material for when you're generating the architecture.
 - Always include a clarification escape hatch ("I'd like more detail on this before deciding").
 - If the user provided a style reference (code example), check whether it already answers a pattern choice. If their example uses functional closures with no classes, don't ask about code style — just use functional.
 
 **If the user doesn't care:**
-
 - If the user says "whatever you think is best" or "I don't have a preference," pick the simplest option that fits the project's scale. Note your choice in the Tech Stack or Notes section so the user knows what was chosen and why.
 
 #### Interview Depth Rules
@@ -144,7 +139,7 @@ When the user indicates they haven't used a system, pattern, or technology befor
 
 When presenting the user with multiple-choice options (e.g., "how modular should integrations be?"), **always include a clarification option** alongside the substantive choices. The user may not understand the implications of an option, or the question itself may be ambiguous. A choice like "I'd like more detail on this before deciding" lets them get clarification on that specific question without being forced to pick blindly or stall the entire interview.
 
-If the user asks for clarification, explain the options with concrete examples of what each would mean for _their specific project_ — not generic definitions. Then re-present the choices. Continue with any remaining questions that weren't blocked by the clarification.
+If the user asks for clarification, explain the options with concrete examples of what each would mean for *their specific project* — not generic definitions. Then re-present the choices. Continue with any remaining questions that weren't blocked by the clarification.
 
 ### Step 2R: Restructuring Interview (Existing Codebases Only)
 
@@ -163,7 +158,6 @@ Present this analysis to the user before asking questions. It shows you actually
 #### Restructuring Interview Questions
 
 Ask only what the analysis didn't answer:
-
 1. **Pain points** — What specifically feels messy or hard to work with? (The user knows where it hurts.)
 2. **Growth direction** — Are you adding features soon, or is this stable code you just want cleaner?
 3. **Migration tolerance** — Do you want a gradual refactor (move one piece at a time) or a clean restructure (reorganize everything at once)?
@@ -175,12 +169,53 @@ Follow the same depth rules as Step 2: one batch, one follow-up max, then genera
 
 When generating the architecture doc for a restructuring project, modify the standard template:
 
-- **Section 1 (Project Overview)**: Focus on what the project _already does_ and what the restructuring aims to achieve. Don't describe the project as if it's new.
+- **Section 1 (Project Overview)**: Focus on what the project *already does* and what the restructuring aims to achieve. Don't describe the project as if it's new.
 - **Section 2 (Scope Boundaries)**: Frame as "what's changing vs. what's staying." In-scope = systems being restructured. Out-of-scope = systems left as-is (with notes on when they'd need attention).
 - **Section 4 (Folder Structure)**: Present as a **before/after comparison**. Show the current structure on the left and the proposed structure on the right, with arrows or annotations showing where each piece of the old structure ends up. This is more useful than a standalone tree for restructuring.
 - **Section 9 (Implementation Tasks)**: Frame as **migration tasks**, not build tasks. Each task should move one piece of the old structure to the new one without breaking the rest. Include a task for "verify nothing broke" after each migration step. Order tasks so the system is functional after every step — no "tear everything apart and reassemble" plans.
 
 The Mermaid diagram should show the **proposed** architecture (not the current one). Optionally produce a second diagram showing the current state if the contrast is helpful.
+
+### Step 2A: Architecture Review (Existing Projects)
+
+When the user wants an assessment of their existing architecture (detected in Step 1), use this workflow. The user isn't asking you to build or restructure — they want an honest critique. They may act on it, or they may just want validation that their approach is sound.
+
+#### Deep Analysis
+
+Read everything the user provides — code, folder structure, config files, package.json, README. Load the appropriate reference file for the stack. Then produce a structured review:
+
+1. **Architecture map.** Describe the project's current architecture in your own words: what the layers are, how data flows, where the boundaries are. This proves you understand it before critiquing it. If the project is large, focus on the top-level structure and one representative vertical slice (e.g., trace a single request from route to database and back).
+
+2. **What's working well.** Lead with strengths. Be specific — "Your separation of routes and controllers is clean" is useful; "looks good overall" is not. Call out patterns that are well-chosen for the project's scale and context. If the user made an unconventional choice that actually works well for their situation, acknowledge it.
+
+3. **Concerns.** Flag issues ranked by impact — things that will cause real problems as the project grows or is maintained. For each concern:
+   - **What the issue is** — concrete, not vague. "Your database queries are mixed into route handlers" not "separation of concerns could be improved."
+   - **Why it matters for this project** — tie it to the project's specific scale, goals, or growth direction. A concern that only matters at 10x the current scale is less urgent than one that's causing pain now.
+   - **What you'd recommend** — a specific, actionable change. Not "consider using a service layer" but "extract the three query functions in routes/users.js into a services/users.js file."
+
+4. **Recommendations.** Broader suggestions that aren't problems but would improve the architecture. These are "if I were building this, I'd also consider..." items. Separate from concerns — these are nice-to-haves, not issues. Examples: adding a linting config, switching to a more appropriate data structure, adding an index to a frequently-queried column.
+
+5. **Verdict.** A brief, honest summary. Is this architecture sound for its purpose? Is it over-engineered? Under-engineered? Would you change the fundamental approach, or just clean up details? The user wants a bottom line.
+
+#### Review Interview (Minimal)
+
+The review mode needs less interview than other modes because the code speaks for itself. Ask only:
+
+1. **Context** (if not obvious from the code) — What's the project's current state? Production? In development? Side project?
+2. **Focus** (optional) — Is there a specific area you're concerned about, or do you want a general review?
+
+One round max. If the user just says "review this" with no other context, proceed with the analysis — the code provides enough context.
+
+#### Review Output Format
+
+The review is delivered **inline in the conversation**, not as a separate markdown file. It's a dialogue, not a document — the user should be able to respond to specific points and drill deeper. Use a Mermaid diagram of the current architecture if it helps illustrate a concern or recommendation.
+
+After the review, offer next steps naturally:
+- "Want me to restructure any of these?" (transitions to Step 2R)
+- "Want me to architect a plan for adding [feature]?" (transitions to Step 2)
+- "Want me to go deeper on any of these concerns?"
+
+This keeps the review as a lightweight entry point that can escalate into the full architecture workflow if the user wants.
 
 ### Step 3: Generate Architecture Document
 
@@ -197,11 +232,9 @@ Not every project needs the same depth. Scale the architecture document to the p
 Use the scale determined during the interview (Question 2: Scale & scope). When in doubt, start leaner — it's easier to expand a section the user wants more detail on than to trim a bloated doc.
 
 #### Section 1: Project Overview
-
 - One paragraph summarizing the project, its goals, and key requirements gathered from the interview.
 
 #### Section 2: Scope Boundaries
-
 - Explicitly define what this version of the project includes and what it does not.
 - **In scope**: List the features and systems being architected. These are the commitments for this version.
 - **Out of scope (with upgrade path)**: List features deliberately excluded. For each, briefly note:
@@ -211,13 +244,11 @@ Use the scale determined during the interview (Question 2: Scale & scope). When 
 - Keep it concise. 3-5 in-scope items, 2-4 out-of-scope items. If the project is small enough that scope is obvious, this section can be brief.
 
 #### Section 3: Tech Stack
-
 - List each technology and **why** it was chosen.
 - If recommending something the user didn't specify, explain the reasoning.
 - Note alternatives considered and why they were passed over.
 
 #### Section 4: Folder & File Structure
-
 - Present as an indented tree (using code block formatting).
 - Include brief inline comments explaining what each directory/file is responsible for.
 - Only go as deep as is useful — top 2-3 levels for large projects.
@@ -233,7 +264,6 @@ project-root/
 ```
 
 #### Section 5: Components & Systems
-
 - List each major component or system.
 - For each, describe:
   - **Responsibility**: What it owns and does.
@@ -241,14 +271,12 @@ project-root/
   - **Dependencies**: What it relies on.
 
 #### Section 6: Data Flow & Relationships
-
 - Describe how data moves through the system end-to-end.
 - Identify the direction of dependencies.
 - Call out any event-driven, pub/sub, or observer patterns.
 - This section should directly correspond to the Mermaid diagram (Step 4).
 
 #### Section 7: Tradeoffs & Pitfalls
-
 - List 3-5 realistic risks, tradeoffs, or pitfalls for this specific architecture.
 - For each, briefly explain:
   - What the risk is.
@@ -257,7 +285,6 @@ project-root/
 - Be honest and specific — generic advice like "write tests" doesn't belong here.
 
 #### Section 8: Simplicity Check
-
 - Review the entire proposed architecture and actively flag areas where a simpler approach could work.
 - For each flagged area, present:
   - **What was proposed**: The component, pattern, or technology in the architecture.
@@ -273,7 +300,6 @@ project-root/
 - The goal is NOT to strip the architecture down — it's to make sure every piece of complexity earns its place. A file that exists "for future extensibility" when there's no concrete plan to extend it is dead weight.
 
 #### Section 9: Implementation Tasks
-
 - Break the architecture into a concrete, ordered list of implementation tasks. This is the "what do I build first?" section — it bridges the gap between the architecture plan and actually writing code.
 - Group tasks into **milestones** that represent a usable vertical slice of the project. Each milestone should produce something that works end-to-end, even if incomplete. For example: Milestone 1 might be "auth + one static page behind login," not "build the entire database layer."
 - For each task:
@@ -285,9 +311,8 @@ project-root/
 - This section is NOT a project management tool. It doesn't track status, assignees, or due dates. It answers one question: "In what order should I build this?"
 
 #### Appendix
-
 - Include at the bottom of every architecture document. This keeps the main sections clean while making the doc self-contained.
-- **Glossary**: Define acronyms and technical terms that the _specific user_ might not know. Scale to the audience — don't define "GCC" for a C++ developer or "REST" for someone who just told you about their Express API. Define terms that are specific to the architecture's recommendations (e.g., "amalgamation" if you recommended the SQLite amalgamation approach, or "PIMPL" if you used that pattern). When in doubt, include it — but a glossary full of terms the user clearly knows is patronizing, not helpful.
+- **Glossary**: Define acronyms and technical terms that the *specific user* might not know. Scale to the audience — don't define "GCC" for a C++ developer or "REST" for someone who just told you about their Express API. Define terms that are specific to the architecture's recommendations (e.g., "amalgamation" if you recommended the SQLite amalgamation approach, or "PIMPL" if you used that pattern). When in doubt, include it — but a glossary full of terms the user clearly knows is patronizing, not helpful.
 - **Reference links**: If the architecture references specific libraries, APIs, or tools, link to their official documentation. The reader shouldn't have to search for "what is CLI11" — give them a URL.
 - **Configuration reference**: If the architecture involves environment variables, config files, or API keys that need to be set up, list them here with a brief description of what each one does and where to get it. For example: `DUO_IKEY` — Duo integration key, found in the Duo Admin Panel under Applications.
 - Keep it practical. Only include terms and references that actually appear in the document. Don't pad it with generic definitions.
@@ -315,7 +340,6 @@ Produce a "before" diagram showing the current structure and an "after" diagram 
 **Unrecognized stacks** → **Flowchart (graph TD)** as default. Adapt based on what makes sense for the architecture.
 
 #### General Diagram Guidelines
-
 - Label nodes clearly with component/system names.
 - Label edges with the nature of the relationship (e.g., "HTTP request", "emits event", "reads from").
 - Group related components using subgraphs where it improves clarity.
@@ -332,7 +356,7 @@ Check for:
 1. **File tree vs. component descriptions**: Every file mentioned in Section 4 (Folder Structure) must correspond to a component in Section 5, and vice versa. No phantom files (listed in the tree but never described), no ghost components (described in Section 5 but absent from the tree).
 2. **Tech stack vs. actual usage**: Every technology in Section 3 must actually appear in the architecture. If a technology was considered and rejected, it should not show up in the file tree, components, or data flow. Conversely, if a library appears in the implementation details, it should be listed in the tech stack with a rationale.
 3. **Data flow vs. components**: The flows described in Section 6 must only reference components and interfaces that exist in Section 5. If a flow mentions "the WebSocket server routes the message," there must be a WebSocket server component.
-4. **Simplicity Check vs. proposed architecture**: Section 8 flags areas that could be simpler. Verify the _proposed_ architecture (Sections 4-6) actually reflects the simpler approach where the Simplicity Check recommends it. If the Simplicity Check says "don't create a separate filter class" but Section 4 still lists `NoteFilter.h`, that's a contradiction.
+4. **Simplicity Check vs. proposed architecture**: Section 8 flags areas that could be simpler. Verify the *proposed* architecture (Sections 4-6) actually reflects the simpler approach where the Simplicity Check recommends it. If the Simplicity Check says "don't create a separate filter class" but Section 4 still lists `NoteFilter.h`, that's a contradiction.
 5. **Feasibility of proposed solutions**: Verify that what's being recommended is actually possible with the stated technologies. Check for things like: APIs that don't exist or work differently than described, library features that require a different version, patterns that don't apply to the stated framework, or configuration that the stated tool doesn't support.
 6. **Diagram vs. document**: Every node in the Mermaid diagram should correspond to a component in Sections 4-5. Every arrow should correspond to a relationship described in Section 6. No orphan nodes, no undocumented connections.
 7. **Scope boundaries vs. architecture**: Features listed as "out of scope" in Section 2 should not appear in the file tree, components, or task list. Features listed as "in scope" must be covered by at least one component and at least one implementation task.
@@ -344,7 +368,6 @@ If inconsistencies are found, fix them silently before presenting to the user. D
 ### Step 6: Review & Iterate
 
 After presenting both deliverables, ask the user:
-
 - Does this match your mental model?
 - Any systems missing or over-engineered?
 - Want to drill deeper into any specific component?
@@ -359,7 +382,7 @@ The user will likely want changes. Handle feedback efficiently:
 
 3. **Track what's approved.** Mentally note which sections the user has signed off on. Don't re-propose changes to approved sections unless the user's new feedback creates a contradiction.
 
-4. **Advocate, don't steamroll.** If the user requests a pattern you think is suboptimal, don't silently comply and don't lecture. Make your case once, clearly: state what you'd recommend instead, _why_ it's stronger for this specific project, and what the user's approach risks. Then respect their decision. If they insist after hearing the tradeoff, implement it — they've made an informed choice. The skill's job is to make sure the user has the information to decide well, not to override them.
+4. **Advocate, don't steamroll.** If the user requests a pattern you think is suboptimal, don't silently comply and don't lecture. Make your case once, clearly: state what you'd recommend instead, *why* it's stronger for this specific project, and what the user's approach risks. Then respect their decision. If they insist after hearing the tradeoff, implement it — they've made an informed choice. The skill's job is to make sure the user has the information to decide well, not to override them.
 
 5. **Support "what if" exploration.** The user may want to compare approaches: "What would it look like if I used SQLite instead of PostgreSQL?" Generate a focused comparison of the affected sections (Tech Stack, Folder Structure, relevant Components) rather than a whole new document.
 
@@ -395,6 +418,6 @@ This is optional — only generate it if the user asks or if you've detected the
 
 - **Explain the "why"** — Don't just list structure; justify decisions. The user wants to understand the reasoning, not just receive a blueprint.
 - **Don't reinvent the wheel** — Lean on industry-standard patterns and proven approaches. If Express middleware, Unity ScriptableObjects, or CMake's target-based model already solve the problem well, use them. Novel architecture should be reserved for novel problems.
-- **Simpler until proven otherwise** — Default to the lightest-weight solution that meets the requirements. The Simplicity Check (Section 8) exists to enforce this. Every layer of abstraction, every additional dependency, and every separated module needs to justify its existence for _this_ project at _this_ scale — not for a hypothetical future version.
-- **Be a collaborator, not a yes-man** — The user's input is the most important signal, but the skill's job is to produce a _great_ architecture, not just a familiar one. When a standard approach is stronger than what the user proposed, advocate for it — explain the benefit, acknowledge the tradeoff, and let them decide. When the user's approach is sound, say so and build on it.
+- **Simpler until proven otherwise** — Default to the lightest-weight solution that meets the requirements. The Simplicity Check (Section 8) exists to enforce this. Every layer of abstraction, every additional dependency, and every separated module needs to justify its existence for *this* project at *this* scale — not for a hypothetical future version.
+- **Be a collaborator, not a yes-man** — The user's input is the most important signal, but the skill's job is to produce a *great* architecture, not just a familiar one. When a standard approach is stronger than what the user proposed, advocate for it — explain the benefit, acknowledge the tradeoff, and let them decide. When the user's approach is sound, say so and build on it.
 - **Favor patterns the user already knows** — If you know the user's tech stack or experience level, lean into familiar patterns rather than introducing unnecessary new concepts. But if an unfamiliar pattern is meaningfully better for the project, introduce it with enough explanation for the user to evaluate it.

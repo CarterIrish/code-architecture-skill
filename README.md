@@ -8,6 +8,7 @@ Most architecture skills generate a document and hand it to you. This one argues
 
 - **Pattern choices** — Instead of defaulting to whatever Claude thinks is "best practice," the skill presents 2-3 valid architectural options (routing style, error handling, state machines, etc.) and lets you pick. Your style preference matters more than convention.
 - **Simplicity Check with teeth** — Every architecture is audited for over-engineering, and the findings are *applied* before you see the doc. If a file would be 20 lines, it gets merged. The Simplicity Check doesn't just flag problems — it fixes them.
+- **Architecture review** — Not ready to restructure but want an honest assessment? Provide your existing project and the skill maps the current architecture, calls out what's working well, flags concerns ranked by impact with specific actionable fixes, and gives a plain verdict. Transitions naturally into restructuring or planning if you want to act on the findings.
 - **Restructuring workflow** — Not just greenfield projects. Provide existing code and the skill analyzes it, identifies structural problems and strengths, produces before/after comparisons, and generates migration tasks that keep your app functional at every step.
 - **Style references** — Provide an existing project you like the structure of, and the skill extracts the patterns (routing style, code conventions, folder layout) and applies them to your new project. No more fighting Claude's default opinions.
 - **Output scaling** — A personal CLI tool doesn't get the same 2000-word treatment as a production multiplayer game. Small projects get a collapsed template; large projects get the full treatment.
@@ -46,8 +47,8 @@ Small projects collapse sections 2, 7, and 8 into a single "Notes" section. Plus
 
 ## Workflow
 
-1. **Detect stack + project mode** → Load reference file(s), route to greenfield / style reference / restructuring
-2. **Interview** → Core questions + stack-specific follow-ups + pattern choices. Adapts to user-provided context. Max 2 rounds.
+1. **Detect stack + project mode** → Load reference file(s), route to greenfield / style reference / restructuring / architecture review
+2. **Interview** → Core questions + stack-specific follow-ups + pattern choices. Adapts to user-provided context. Max 2 rounds. (Review mode uses a minimal 1-round interview — the code provides most of the context.)
 3. **Generate** → Architecture doc scaled to project complexity + Mermaid diagram
 4. **Consistency check** → 9-point internal audit
 5. **Review & iterate** → Targeted revisions with cascade tracking. Supports "what if" comparisons and drill-downs.
@@ -93,6 +94,8 @@ Copy-Item -Recurse code-architecture "$HOME\.claude\skills\code-architecture"
 - *"Help me plan the architecture for a Unity 2D roguelike with proc-gen and crafting"*
 - *"I'm building a C++ CLI tool with CMake — I've never set up CMake before"*
 - *"Here's my 400-line server.js monolith — help me break it apart"*
+- *"Review my architecture and tell me what you think"*
+- *"Here's my project structure — any recommendations before I add more features?"*
 - *"Use this MVC example as a style reference for my new project"*
 - *"I'd rather use MongoDB and Redis for sessions"* (mid-conversation revision)
 
