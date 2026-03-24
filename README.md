@@ -28,6 +28,26 @@ Most architecture skills generate a document and hand it to you. This one argues
 
 The skill auto-detects the stack from your request. Projects spanning multiple stacks (e.g., a multiplayer game with a Node.js backend) load all relevant references.
 
+## Skill structure
+
+The skill uses progressive disclosure — SKILL.md is a concise overview that points to detailed reference files loaded on-demand:
+
+```
+code-architecture/
+├── SKILL.md                          # Main instructions (~170 lines)
+├── .claude-plugin/
+│   └── marketplace.json              # Claude Code plugin metadata
+├── references/
+│   ├── INTERVIEW.md                  # Detailed interview workflow
+│   ├── DOC-TEMPLATE.md               # Architecture document section guide
+│   ├── CONSISTENCY.md                # 9-point consistency checklist
+│   ├── nodejs-express.md             # Node.js/Express patterns & choices
+│   ├── unity.md                      # Unity (C#) patterns & choices
+│   └── cpp-cmake.md                  # C++/CMake patterns & choices
+├── LICENSE
+└── README.md
+```
+
 ## Architecture document sections
 
 The skill produces a markdown document scaled to your project's complexity:
@@ -48,7 +68,7 @@ Small projects collapse sections 2, 7, and 8 into a single "Notes" section. Plus
 ## Workflow
 
 1. **Detect stack + project mode** → Load reference file(s), route to greenfield / style reference / restructuring / architecture review
-2. **Interview** → Core questions + stack-specific follow-ups + pattern choices. Adapts to user-provided context. Max 2 rounds. (Review mode uses a minimal 1-round interview — the code provides most of the context.)
+2. **Interview** → Core questions + stack-specific follow-ups + pattern choices. Adapts to user-provided context. Max 2 rounds. (Review mode uses a minimal 1-round interview.)
 3. **Generate** → Architecture doc scaled to project complexity + Mermaid diagram
 4. **Consistency check** → 9-point internal audit
 5. **Review & iterate** → Targeted revisions with cascade tracking. Supports "what if" comparisons and drill-downs.
@@ -74,9 +94,19 @@ claude plugin install code-architecture@code-architecture-marketplace
 
 ### Claude.ai
 
-Download `code-architecture.skill` from [Releases](../../releases) and drag it into a Claude conversation, or upload it in **Settings > Customize > Skills**.
+Download the `.zip` file from [Releases](../../releases) and upload it in **Settings > Customize > Skills**.
 
-### Manual install
+The ZIP must contain the skill folder at the root:
+```
+code-architecture.zip
+└── code-architecture/
+    ├── SKILL.md
+    ├── references/
+    │   └── ...
+    └── ...
+```
+
+### Manual install (Claude Code)
 
 Copy the skill directory into your personal skills folder:
 

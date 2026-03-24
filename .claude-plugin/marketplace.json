@@ -1,4 +1,5 @@
 {
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "code-architecture-marketplace",
   "description": "Collaborative code architecture planning skill with pattern choices, restructuring workflows, simplicity checks, and stack-specific reference files.",
   "owner": {
@@ -8,8 +9,8 @@
     {
       "name": "code-architecture",
       "source": "./",
-      "description": "Plan, document, and review code architecture for software projects. Collaborative workflow with pattern choices, restructuring support, output scaling, simplicity checks, scope boundaries, and AI-ready implementation specs. Deep reference patterns for Node.js/Express, Unity (C#), and C++/CMake — works for any stack.",
-      "version": "2.1.0",
+      "description": "Plans, documents, and reviews code architecture for software projects. Collaborative workflow with pattern choices, restructuring support, output scaling, simplicity checks, scope boundaries, and AI-ready implementation specs. Deep reference patterns for Node.js/Express, Unity (C#), and C++/CMake — works for any stack.",
+      "version": "3.0.0",
       "author": {
         "name": "Carter Irish"
       },
