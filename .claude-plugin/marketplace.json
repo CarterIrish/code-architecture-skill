@@ -1,6 +1,6 @@
 {
   "name": "code-architecture-marketplace",
-  "description": "Collaborative code architecture planning skill with simplicity checks, scope boundaries, and multi-domain support.",
+  "description": "Collaborative code architecture planning skill with pattern choices, restructuring workflows, simplicity checks, and stack-specific reference files.",
   "owner": {
     "name": "Carter Irish"
   },
@@ -8,8 +8,8 @@
     {
       "name": "code-architecture",
       "source": "./",
-      "description": "Plan, document, and review code architecture for software projects. Collaborative workflow with simplicity checks, scope boundaries, and multi-domain support (web, game, C++/CMake).",
-      "version": "1.1.0",
+      "description": "Plan, document, and review code architecture for software projects. Collaborative workflow with pattern choices, restructuring support, output scaling, simplicity checks, scope boundaries, and AI-ready implementation specs. Deep reference patterns for Node.js/Express, Unity (C#), and C++/CMake — works for any stack.",
+      "version": "2.0.0",
       "author": {
         "name": "Carter Irish"
       },

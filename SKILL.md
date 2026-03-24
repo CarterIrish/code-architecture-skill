@@ -7,9 +7,10 @@ description: >
   "system design," "project structure," "folder structure," "component design," "data flow,"
   "separation of concerns," "restructure my project," "refactor this layout," or "here's my current
   code, help me plan the next phase." Also handles evolving existing codebases — analyzes provided
-  code, folder structures, or reference projects and builds on them. Covers web dev (Node.js,
-  Express, REST, databases), game dev (Unity, C#, ScriptableObjects), and C++/CMake (CLI tools,
-  libraries, systems programming). Loads domain-specific reference files based on context.
+  code, folder structures, or reference projects and builds on them rather than starting from scratch.
+  Has deep reference patterns for Node.js/Express, Unity (C#), and C++/CMake, but works for ANY
+  technology stack — the core workflow (interview, architecture doc, diagram, consistency check) is
+  stack-agnostic. Detect the stack from context and load the appropriate reference file if one exists.
 ---
 
 # Code Architecture Planner
@@ -20,22 +21,29 @@ covering all key decisions.
 
 ## Workflow
 
-### Step 1: Detect Domain
+### Step 1: Detect Stack
 
-Determine the project's domain from the user's request. Look for cues:
+Identify the specific technology stack from the user's request. Look for explicit mentions of
+frameworks, languages, and tools — not broad categories.
 
-- **Web**: mentions of APIs, endpoints, databases, Express, Node, React, auth, REST, middleware, deployment
-- **Game**: mentions of Unity, Unreal, C#, game systems, ECS, player mechanics, scenes, prefabs, ScriptableObjects
-- **C++ / CMake**: mentions of C++, CMake, CLI tools, systems programming, header/source files, libraries, FetchContent, vcpkg
+**Known stacks** (load the corresponding reference file):
+- **Node.js / Express**: Express, Node, npm, middleware, REST API with JavaScript/TypeScript → read `references/nodejs-express.md`
+- **Unity**: Unity, C#, MonoBehaviour, ScriptableObject, prefab, scene, game development with C# → read `references/unity.md`
+- **C++ / CMake**: C++, CMake, header files, FetchContent, vcpkg, systems programming → read `references/cpp-cmake.md`
 
-A project can span multiple domains (e.g., a game with a Node.js backend). Load all relevant references in that case.
+**Unrecognized stack**: If the project uses a technology without a reference file (Django, Flask, Go, Unreal, Godot, Rust, React Native, etc.), proceed without loading a reference. The core workflow — interview, architecture doc, diagram, consistency check — works for any stack. Use your general knowledge of that technology instead. Don't apologize for the lack of a reference file; just produce the architecture.
 
-If ambiguous, ask the user.
+A project can span multiple stacks (e.g., a Unity game with a Node.js backend). Load all relevant references.
 
-Once determined, read the appropriate reference file(s) for domain-specific patterns:
-- Web projects → read `references/webdev.md`
-- Game projects → read `references/gamedev.md`
-- C++ / CMake projects → read `references/cpp-cmake.md`
+If the stack is ambiguous and it matters for the architecture (e.g., the user says "a web app" but hasn't specified a framework), ask as part of the interview — don't make it a separate step.
+
+Also determine the **project mode** — this affects which workflow to follow. The user may provide existing code, but the intent behind providing it matters:
+
+- **Greenfield** (building from scratch, no existing code provided) → proceed to Step 2 (Requirements Interview)
+- **Greenfield with style reference** (building something new, but the user provided existing code as an example of patterns they like — "use this project as a reference," "I like how this is structured," "here's an example of the style I want") → proceed to Step 2 (Requirements Interview). The reference code is input *context*, not the project being architected. Analyze it during the "Handling User-Provided Context" phase of Step 2 to extract patterns, naming conventions, and structural preferences, then apply them to the new project's architecture.
+- **Restructuring** (the user has existing code that IS the project, and wants it reorganized — "my code is messy," "break this apart," "how should I restructure this") → proceed to Step 2R (Restructuring Interview)
+
+The distinction between "style reference" and "restructuring" is about ownership and intent. If the user says "here's my Express app, it's a mess, help me fix it" — that's restructuring. If the user says "here's an MVC example I like, I want to build a new project using this style" — that's greenfield with a style reference. If ambiguous, ask: "Is this the project you want me to architect, or an example of a style you'd like me to follow?"
 
 ### Step 2: Requirements Interview
 
@@ -64,15 +72,120 @@ Ask these as a single concise batch — don't drip-feed one question at a time.
 
 If the user's initial message already answers some of these clearly, acknowledge what you know and only ask about the gaps.
 
+#### Stack-Specific Interview Questions
+
+After the core questions, add stack-specific follow-ups based on the detected stack. Only ask what's relevant and unanswered.
+
+**Unity / Game projects:**
+- Target platform (PC, mobile, web, console)?
+- Art style or asset approach (pixel art, 3D, procedural, purchased assets)?
+- Target scope — game jam, semester project, portfolio piece, commercial release?
+- Any existing art, music, or design docs?
+- Multiplayer or single-player?
+
+**Node.js / Express projects:**
+- Will there be a frontend consuming this API, or is it standalone?
+- Expected traffic — personal use, small group, public-facing?
+- Deployment target — home lab, cloud (Heroku, Railway, AWS), containerized?
+- Any existing data or databases to integrate with?
+
+**C++ / CMake projects:**
+- Is this a library, an application, or both?
+- Target platforms and compilers (GCC, Clang, MSVC, cross-platform)?
+- Any required third-party dependencies already known?
+
+For unrecognized stacks, use the core questions only and let the user's answers guide any follow-ups.
+
+#### Pattern Choices
+
+Each reference file contains a **Pattern Choices** section with 2-3 options for key architectural decisions (e.g., routing style, error handling, state machine approach). These represent decisions where multiple approaches are equally valid and the "right" answer depends on user preference, not best practice.
+
+**When to present pattern choices:**
+- After the initial interview batch, once you know the project's scale and features. Some choices only matter for certain project types (e.g., routing style only matters if there are multiple routes).
+- Present only the choices that are relevant to this specific project. A simple CLI tool doesn't need a state machine choice; a game with 3 enemy types does.
+- Present 1-3 pattern choices per project. More than that overwhelms the interview. Pick the ones that most affect the architecture's shape.
+
+**How to present them:**
+- Use the short labels from the reference file (A, B, C) with a one-sentence description of each option. Don't dump code examples during the interview — those are reference material for when you're generating the architecture.
+- Always include a clarification escape hatch ("I'd like more detail on this before deciding").
+- If the user provided a style reference (code example), check whether it already answers a pattern choice. If their example uses functional closures with no classes, don't ask about code style — just use functional.
+
+**If the user doesn't care:**
+- If the user says "whatever you think is best" or "I don't have a preference," pick the simplest option that fits the project's scale. Note your choice in the Tech Stack or Notes section so the user knows what was chosen and why.
+
+#### Interview Depth Rules
+
+The interview should be efficient, not exhaustive. Follow this pacing:
+
+1. **Initial batch**: Ask the core questions + relevant stack-specific questions as a single message. Skip anything the user's prompt already answers. This is usually 3-6 questions.
+2. **One follow-up round** (if needed): After the user responds, present relevant pattern choices and/or ask up to 3 clarifying questions. Pattern choices and clarifying questions can be combined in one message. Only ask follow-ups that would meaningfully change the architecture — not nice-to-haves.
+3. **Then generate.** After at most two rounds of questions, you have enough to produce the architecture. If minor details are still unclear, make a reasonable assumption, state it in the Project Overview, and let the user correct it during review. Don't hold the architecture hostage to perfect information.
+
+If the user signals impatience ("just build it," "that's enough questions," short answers), skip pattern choices and generate immediately with reasonable defaults (simplest option per choice).
+
+#### Handling User Unfamiliarity
+
+When the user indicates they haven't used a system, pattern, or technology before (e.g., "I've never built a crafting system," "I'm new to WebSockets," "first time using CMake"), adapt the architecture:
+
+1. **Prefer accessible patterns over optimal ones.** If the user has never built proc-gen, recommend cellular automata or BSP (well-documented, easy to visualize) over wave function collapse (powerful but harder to debug). The "best" architecture is the one the user can actually build.
+2. **Flag the learning curve in Tradeoffs (Section 7).** Be specific: "You mentioned you haven't built a save system before. The ISaveable pattern recommended here is straightforward but requires understanding C# interfaces — here's what to expect."
+3. **Sequence implementation tasks to build skills progressively.** In Section 9, order tasks so the user encounters unfamiliar concepts one at a time, with working feedback loops in between. Don't stack three new concepts into Milestone 1.
+4. **Include reference links in the Appendix.** For each unfamiliar system, add a link to the best learning resource (official docs, a well-known tutorial, a reference implementation). Not a reading list — one or two high-quality links per unfamiliar concept.
+
 #### Offering choices with a clarification escape hatch
 
 When presenting the user with multiple-choice options (e.g., "how modular should integrations be?"), **always include a clarification option** alongside the substantive choices. The user may not understand the implications of an option, or the question itself may be ambiguous. A choice like "I'd like more detail on this before deciding" lets them get clarification on that specific question without being forced to pick blindly or stall the entire interview.
 
 If the user asks for clarification, explain the options with concrete examples of what each would mean for *their specific project* — not generic definitions. Then re-present the choices. Continue with any remaining questions that weren't blocked by the clarification.
 
+### Step 2R: Restructuring Interview (Existing Codebases Only)
+
+When the user has existing code they want to reorganize (detected in Step 1), use this alternate interview flow instead of Step 2's greenfield interview. The user already knows what their project does — they need help organizing it better.
+
+#### Analysis Phase
+
+Before asking any questions, analyze what the user provided:
+
+1. **Map the current structure.** Identify files, their responsibilities, and how they relate. For a monolith file, identify the logical sections (routes, middleware, queries, config). For a multi-file project, map the dependency graph.
+2. **Identify structural problems.** Name the specific issues: "server.js is handling routing, auth, DB queries, and config in one 400-line file" or "your controllers are importing each other circularly." Be concrete, not vague.
+3. **Identify what's working.** Not everything needs to change. Call out good patterns: "Your middleware chain is clean," "Your naming conventions are consistent." This builds trust and prevents unnecessary churn.
+
+Present this analysis to the user before asking questions. It shows you actually read their code and gives them a chance to correct misunderstandings.
+
+#### Restructuring Interview Questions
+
+Ask only what the analysis didn't answer:
+1. **Pain points** — What specifically feels messy or hard to work with? (The user knows where it hurts.)
+2. **Growth direction** — Are you adding features soon, or is this stable code you just want cleaner?
+3. **Migration tolerance** — Do you want a gradual refactor (move one piece at a time) or a clean restructure (reorganize everything at once)?
+4. **Constraints** — Anything that can't change? (e.g., "the DB schema stays," "I can't rename the main file because PM2 is configured to watch it")
+
+Follow the same depth rules as Step 2: one batch, one follow-up max, then generate.
+
+#### Restructuring-Specific Output Adjustments
+
+When generating the architecture doc for a restructuring project, modify the standard template:
+
+- **Section 1 (Project Overview)**: Focus on what the project *already does* and what the restructuring aims to achieve. Don't describe the project as if it's new.
+- **Section 2 (Scope Boundaries)**: Frame as "what's changing vs. what's staying." In-scope = systems being restructured. Out-of-scope = systems left as-is (with notes on when they'd need attention).
+- **Section 4 (Folder Structure)**: Present as a **before/after comparison**. Show the current structure on the left and the proposed structure on the right, with arrows or annotations showing where each piece of the old structure ends up. This is more useful than a standalone tree for restructuring.
+- **Section 9 (Implementation Tasks)**: Frame as **migration tasks**, not build tasks. Each task should move one piece of the old structure to the new one without breaking the rest. Include a task for "verify nothing broke" after each migration step. Order tasks so the system is functional after every step — no "tear everything apart and reassemble" plans.
+
+The Mermaid diagram should show the **proposed** architecture (not the current one). Optionally produce a second diagram showing the current state if the contrast is helpful.
+
 ### Step 3: Generate Architecture Document
 
-After the interview, produce a **structured markdown architecture document** with these sections in order:
+After the interview, produce a **structured markdown architecture document** with these sections in order.
+
+#### Output Scaling
+
+Not every project needs the same depth. Scale the architecture document to the project's complexity:
+
+- **Small projects** (personal tool, single-purpose API, game jam): **Collapse the template.** Merge Scope Boundaries, Tradeoffs, and Simplicity Check into a single "Notes" section — short bullets, not full subsections. Skip "Considered and passed over" in Tech Stack. The Appendix should only include terms the user genuinely might not know (don't define "GCC" for a C++ developer). Total doc: ~500-1000 words. Implementation tasks: 5-8. If the project is small enough that the folder tree is obvious, the architecture doc might be overkill — say so and offer to just scaffold the project instead.
+- **Medium projects** (portfolio piece, multi-system app, semester project): Full sections with meaningful detail. Total doc: ~1500-2500 words. Implementation tasks: 10-20.
+- **Large projects** (production app, team project, complex game with many systems): Detailed sections, multiple diagrams, thorough tradeoff analysis. Total doc: ~2500-4000 words. Implementation tasks: 15-25 (or flag that a separate planning session is needed).
+
+Use the scale determined during the interview (Question 2: Scale & scope). When in doubt, start leaner — it's easier to expand a section the user wants more detail on than to trim a bloated doc.
 
 #### Section 1: Project Overview
 - One paragraph summarizing the project, its goals, and key requirements gathered from the interview.
@@ -135,11 +248,12 @@ project-root/
   - **When to upgrade**: The specific trigger or threshold that would justify adopting the more complex approach.
 - This section is an honest self-audit. Look for patterns like:
   - Abstractions with only one implementation (do you really need an interface for that?).
-  - Separate services or modules that could be a single file at this scale.
+  - Separate files or modules that could be merged at this scale. If a file would be <30 lines, it probably doesn't need to exist separately.
   - External dependencies where the standard library would suffice.
   - Patterns designed for team/production scale applied to a solo/personal project.
   - Premature infrastructure (caching layers, message queues, microservices) before the simple version has proven insufficient.
-- The goal is NOT to strip the architecture down — it's to give the user clear, honest signals about where they can start simpler and scale up later, versus where the proposed complexity is justified from day one.
+- **Apply your own findings.** This is critical. If the Simplicity Check identifies something that should be simpler, go back and actually simplify it in Sections 4-6 before presenting the document. Don't flag "this could be one file instead of two" and then leave two files in the tree. The Simplicity Check should only show items where the complexity is genuinely justified despite looking suspicious — cases where you considered simplifying and decided the current approach earns its weight. If you can't articulate a concrete, project-specific reason to keep the complexity, simplify it.
+- The goal is NOT to strip the architecture down — it's to make sure every piece of complexity earns its place. A file that exists "for future extensibility" when there's no concrete plan to extend it is dead weight.
 
 #### Section 9: Implementation Tasks
 - Break the architecture into a concrete, ordered list of implementation tasks. This is the "what do I build first?" section — it bridges the gap between the architecture plan and actually writing code.
@@ -154,24 +268,38 @@ project-root/
 
 #### Appendix
 - Include at the bottom of every architecture document. This keeps the main sections clean while making the doc self-contained.
-- **Glossary**: Define every acronym and technical term used in the document that isn't common English. If you wrote "FK," "TTL," "FIFO," "RLS," "CRUD," "MFA," "ORM," or any domain-specific term, define it here. Assume the reader is technically literate but may not share your exact vocabulary. Format as a simple term → definition list.
+- **Glossary**: Define acronyms and technical terms that the *specific user* might not know. Scale to the audience — don't define "GCC" for a C++ developer or "REST" for someone who just told you about their Express API. Define terms that are specific to the architecture's recommendations (e.g., "amalgamation" if you recommended the SQLite amalgamation approach, or "PIMPL" if you used that pattern). When in doubt, include it — but a glossary full of terms the user clearly knows is patronizing, not helpful.
 - **Reference links**: If the architecture references specific libraries, APIs, or tools, link to their official documentation. The reader shouldn't have to search for "what is CLI11" — give them a URL.
 - **Configuration reference**: If the architecture involves environment variables, config files, or API keys that need to be set up, list them here with a brief description of what each one does and where to get it. For example: `DUO_IKEY` — Duo integration key, found in the Duo Admin Panel under Applications.
 - Keep it practical. Only include terms and references that actually appear in the document. Don't pad it with generic definitions.
 
 ### Step 4: Generate Mermaid Diagram
 
-After (or alongside) the written doc, produce a **Mermaid diagram** that visualizes the architecture. Choose the diagram type that best fits:
+After (or alongside) the written doc, produce a **Mermaid diagram** that visualizes the architecture.
 
-- **Flowchart (graph TD/LR)** — Good for showing system components and their relationships. Use this as the default.
-- **Sequence diagram** — Good for showing request/response flows or time-ordered interactions between systems.
-- **Class diagram** — Good for showing inheritance hierarchies or data models in game dev.
+#### Stack-Specific Diagram Defaults
 
-Guidelines for the diagram:
+Choose the diagram type based on the project's stack. These are defaults — override if the project's specific architecture calls for something different.
+
+**Node.js / Express / Web APIs** → **Flowchart (graph TD or LR)**
+Show the request flow through layers: Client → Route → Controller → Service → Database. Use subgraphs to group middleware, routes, and data layers. Label edges with the nature of the interaction ("HTTP request", "SQL query", "session check"). This is the most useful diagram for understanding how a request moves through the system.
+
+**Unity / Game projects** → **Class diagram** (primary) + **Flowchart** (secondary)
+The class diagram shows system composition: which managers exist, what ScriptableObjects define data, how systems reference each other. This is usually the most valuable diagram for game architecture because it shows ownership and data flow between systems. Add a secondary flowchart for game state flow (MainMenu → Loading → Playing → Paused → GameOver) if the project has meaningful state transitions.
+
+**C++ / CMake projects** → **Flowchart (graph TD)**
+Show the module/library dependency graph: which targets link against which, where the public interfaces are. Use subgraphs for library vs. application vs. test targets. Label edges with "links against" or "includes."
+
+**Restructuring projects** → **Two diagrams**
+Produce a "before" diagram showing the current structure and an "after" diagram showing the proposed architecture. This makes the transformation concrete and lets the user see exactly what changes. If the current structure is a monolith (everything in one file), the "before" diagram can be a simple box showing the tangle; the "after" shows the clean separation.
+
+**Unrecognized stacks** → **Flowchart (graph TD)** as default. Adapt based on what makes sense for the architecture.
+
+#### General Diagram Guidelines
 - Label nodes clearly with component/system names.
 - Label edges with the nature of the relationship (e.g., "HTTP request", "emits event", "reads from").
 - Group related components using subgraphs where it improves clarity.
-- Keep it readable — if the system is complex, create multiple focused diagrams rather than one overwhelming one.
+- Keep it readable — if the system is complex, create multiple focused diagrams rather than one overwhelming one. A diagram with more than ~15 nodes is usually too dense; split into subsystem diagrams.
 
 Use the Mermaid Chart tool to render the diagram if available. Otherwise, output the Mermaid code in a fenced code block.
 
@@ -223,6 +351,24 @@ The user will likely want changes. Handle feedback efficiently:
 ## Output Format
 
 The architecture document should be delivered as a **markdown file** saved to the outputs directory so the user can download it. The Mermaid diagram should be rendered inline using the Mermaid Chart tool if available.
+
+### Implementation Spec (AI-Ready Output)
+
+After the user approves the architecture, offer to generate an **implementation spec** — a stripped-down, structured version of the architecture optimized for feeding into AI coding tools (Claude Code, Cursor, etc.). The architecture doc is for the human to read and decide; the implementation spec is for an AI to execute.
+
+The implementation spec should contain only actionable information, no prose explanations:
+
+1. **File tree** — the complete folder/file structure, copy-paste ready.
+2. **Interfaces** — every public function signature, struct/class definition, and type. Use actual code syntax for the target language, not prose descriptions. For example: `int calculateStreak(const std::vector<std::string>& completionDates);` not "a function that calculates the streak."
+3. **Schemas** — database schemas (SQL), data models (JSON shape), API contracts (endpoint + request/response shape). Copy-paste ready.
+4. **Implementation task list** — the ordered task list from Section 9, but stripped to just task name, dependencies, and a one-line description. No effort estimates or milestone framing — the AI doesn't need to plan its time.
+5. **Constraints** — any non-obvious rules the AI must follow: "use the SQLite amalgamation, not system SQLite," "all dates stored as YYYY-MM-DD strings in local time," "CSV output must follow RFC 4180 escaping."
+
+Omit from the implementation spec: Project Overview, Scope Boundaries, "why" explanations, Tradeoffs, Simplicity Check, Appendix glossary. These served their purpose during the architecture review — the decisions are made, the AI just needs to build.
+
+Save the implementation spec as a separate markdown file (e.g., `project-name-spec.md`). Don't combine it with the architecture doc — they serve different audiences.
+
+This is optional — only generate it if the user asks or if you've detected they plan to use AI tooling for implementation. A natural prompt: "Want me to generate an implementation spec you can hand to Claude Code?"
 
 ## Important Principles
 
