@@ -33,6 +33,16 @@ Scope boundaries aren't walls — they're thresholds with a known cost to cross.
 - If recommending something the user didn't specify, explain the reasoning.
 - Note alternatives considered and why they were passed over.
 
+**When Tech Discovery was performed:** This section should reflect and expand on the
+decisions made during Tech Discovery. The requirement-to-technology mapping established
+there becomes the backbone of this section. Include:
+- The original project requirements that drove each choice (carried forward from discovery).
+- Any refinements made during the interview that adjusted the stack.
+- Alternatives that were discussed and the user's reasoning for their final choice.
+
+This creates a clear audit trail: the reader can trace *why* each technology is here by
+following it back to a concrete project need.
+
 ## Section 4: Folder & File Structure
 
 Present as an indented tree with inline comments:

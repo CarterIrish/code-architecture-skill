@@ -20,11 +20,12 @@ key decisions.
 ## Workflow Overview
 
 1. **Detect Stack** — Identify technology and project mode
-2. **Interview** — Gather requirements (max 2 rounds)
-3. **Generate** — Architecture document + Mermaid diagram
-4. **Consistency Check** — 9-point internal audit
-5. **Review & Iterate** — Targeted revisions with cascade tracking
-6. **Implementation Spec** *(optional)* — AI-ready output for coding tools
+2. **Tech Discovery** *(if stack unclear)* — Analyze project needs, recommend technologies
+3. **Interview** — Gather requirements (max 2 rounds)
+4. **Generate** — Architecture document + Mermaid diagram
+5. **Consistency Check** — 9-point internal audit
+6. **Review & Iterate** — Targeted revisions with cascade tracking
+7. **Implementation Spec** *(optional)* — AI-ready output for coding tools
 
 ## Step 1: Detect Stack
 
@@ -41,19 +42,53 @@ stack. Use general knowledge of that technology instead.
 
 A project can span multiple stacks. Load all relevant references.
 
+**No clear stack specified**: If the user describes the project by purpose or domain without
+naming specific technologies → proceed to Step 2 (Tech Discovery).
+
+**Clear stack specified**: Skip Step 2, proceed directly to Step 3 (Interview).
+
 If the stack is ambiguous and it matters for the architecture, ask as part of the interview.
 
 **Determine the project mode** — this selects the interview workflow:
 
-- **Greenfield** (building from scratch) → Step 2
-- **Greenfield with style reference** (new project, but user provided example code they like) → Step 2. Analyze the reference code for patterns and conventions, then apply them to the new project.
-- **Restructuring** (user has existing code that IS the project, wants it reorganized) → Step 2R
-- **Architecture Review** (user wants an honest assessment of their existing project) → Step 2A
+- **Greenfield** (building from scratch) → Step 2 or Step 3
+- **Greenfield with style reference** (new project, but user provided example code they like) → Step 2 or Step 3. Analyze the reference code for patterns and conventions, then apply them to the new project.
+- **Restructuring** (user has existing code that IS the project, wants it reorganized) → Step 3R
+- **Architecture Review** (user wants an honest assessment of their existing project) → Step 3A
 
 If ambiguous, ask: "Is this the project you want me to architect, an example of a style you'd
 like me to follow, or would you like me to review what you have?"
 
-## Step 2: Requirements Interview
+## Step 2: Tech Discovery
+
+**Triggers when** the user describes a project by purpose or domain without specifying a clear
+technology stack. For example: "I want to build a personal dashboard" or "I need a tool to
+manage my home lab."
+
+**Skip when** the user has already named their technologies: "I want to build a React app with
+an Express backend and PostgreSQL."
+
+For the full Tech Discovery workflow — including the requirements analysis framework,
+how to present recommendations, and handling partial stack specifications — see
+[references/INTERVIEW.md](references/INTERVIEW.md#tech-discovery).
+
+### Summary
+
+1. **Gather project purpose.** If the user's initial message is clear, move straight to analysis.
+   If vague, ask 1-2 clarifying questions about what the project does (not how to build it).
+2. **Identify technical requirements.** Analyze the project description for capability needs:
+   real-time updates, data persistence, authentication, external API integration, file handling,
+   background tasks, etc. Be specific about *why* each need exists in this project.
+3. **Recommend a stack.** Present a cohesive technology recommendation — not individual tools
+   in isolation, but a stack that works together. Justify each choice by tying it to a specific
+   project requirement identified in the previous step.
+4. **Wait for approval.** Do not proceed to the interview until the user confirms the stack or
+   requests changes. If they push back on specific choices, adjust and re-present.
+
+After approval, load any relevant reference files for the confirmed stack, then proceed to
+Step 3 (Interview).
+
+## Step 3: Requirements Interview
 
 **Always begin by interviewing the user.** For detailed interview guidance including handling
 user-provided context, stack-specific questions, pattern choices, and interview depth rules,
@@ -68,6 +103,7 @@ see [references/INTERVIEW.md](references/INTERVIEW.md).
 5. **Constraints** — Timeline, platform targets, performance, hosting limitations?
 
 Ask these as a single concise batch. Skip anything the user's prompt already answers.
+**If Tech Discovery was completed**, skip questions 1 and 4 entirely — those are already resolved.
 
 ### Interview Pacing
 
@@ -77,7 +113,7 @@ Ask these as a single concise batch. Skip anything the user's prompt already ans
 
 If the user signals impatience, skip pattern choices and generate with reasonable defaults.
 
-## Step 2R: Restructuring Interview
+## Step 3R: Restructuring Interview
 
 For users with existing code they want reorganized. See [references/INTERVIEW.md](references/INTERVIEW.md)
 for the full restructuring workflow.
@@ -88,7 +124,7 @@ for the full restructuring workflow.
 3. Ask about: pain points, growth direction, migration tolerance, constraints.
 4. Generate with before/after comparisons and migration tasks.
 
-## Step 2A: Architecture Review
+## Step 3A: Architecture Review
 
 For users wanting an honest assessment of their existing architecture. See
 [references/INTERVIEW.md](references/INTERVIEW.md) for the full review workflow.
@@ -100,7 +136,7 @@ For users wanting an honest assessment of their existing architecture. See
 4. Give a brief, honest verdict.
 5. Deliver inline in conversation, then offer next steps.
 
-## Step 3: Generate Architecture Document
+## Step 4: Generate Architecture Document
 
 Produce a structured markdown architecture document. For complete section-by-section guidance
 including output scaling rules, see [references/DOC-TEMPLATE.md](references/DOC-TEMPLATE.md).
@@ -115,7 +151,7 @@ including output scaling rules, see [references/DOC-TEMPLATE.md](references/DOC-
 
 1. **Project Overview** — Goals and requirements summary
 2. **Scope Boundaries** — In scope, out of scope with upgrade paths
-3. **Tech Stack** — Each technology with justification
+3. **Tech Stack** — Each technology with justification (incorporates Tech Discovery decisions if applicable)
 4. **Folder & File Structure** — Annotated directory tree
 5. **Components & Systems** — Responsibility, interface, dependencies
 6. **Data Flow & Relationships** — End-to-end data movement
@@ -126,7 +162,7 @@ including output scaling rules, see [references/DOC-TEMPLATE.md](references/DOC-
 
 Deliver as a markdown file saved to the outputs directory.
 
-## Step 4: Generate Mermaid Diagram
+## Step 5: Generate Mermaid Diagram
 
 ### Stack-Specific Defaults
 
@@ -145,7 +181,7 @@ Deliver as a markdown file saved to the outputs directory.
 
 Use the Mermaid Chart tool to render if available.
 
-## Step 5: Consistency Check
+## Step 6: Consistency Check
 
 Before presenting, run a 9-point audit. For the complete checklist, see
 [references/CONSISTENCY.md](references/CONSISTENCY.md).
@@ -163,7 +199,7 @@ Before presenting, run a 9-point audit. For the complete checklist, see
 
 Fix inconsistencies silently before presenting.
 
-## Step 6: Review & Iterate
+## Step 7: Review & Iterate
 
 After presenting, ask:
 - Does this match your mental model?
